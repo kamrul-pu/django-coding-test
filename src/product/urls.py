@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from product.views.product import (
     CreateProductView,
     ProductListView,
+    ProductUpdateView,
 )
 from product.views.variant import VariantView, VariantCreateView, VariantEditView
 
@@ -21,4 +22,5 @@ urlpatterns = [
         ProductListView.as_view(),
         name="list.product",
     ),
+    path("update/<int:pk>/", ProductUpdateView.as_view(), name="update.product"),
 ]
