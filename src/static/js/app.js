@@ -32811,6 +32811,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+function getCookie(name) {
+  var value = "; ".concat(document.cookie);
+  var parts = value.split("; ".concat(name, "="));
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
 var CreateProduct = function CreateProduct(props) {
   var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])([]),
     _useState2 = _slicedToArray(_useState, 2),
@@ -32892,6 +32897,57 @@ var CreateProduct = function CreateProduct(props) {
   var saveProduct = function saveProduct(event) {
     event.preventDefault();
     // TODO : write your code here to save the product
+    var product_name = document.getElementById("product_name").value;
+    console.log("product name", product_name);
+    var product_sku = document.getElementById("product_name").value;
+    var product_description = document.getElementById("product_description").value;
+    // Get the CSRF token from the cookie
+    var csrftoken = getCookie('csrftoken');
+    // Append CSRF token to headers
+    var headers = new Headers({
+      'X-CSRFToken': csrftoken
+    });
+    // Prepare data to send to the server
+    var formData = new FormData();
+    formData.append('product_name', product_name);
+    formData.append('product_sku', product_sku);
+    formData.append('description', product_description);
+
+    // const files = document.files;
+    // console.log("fiels", files);
+
+    // Append product image
+    // const productImageInput = document.getElementById('productImage');
+    // const productImageFile = productImageInput.files[0];
+    // formData.append('product_image', productImageFile);
+
+    // productVariants is an array containing variant data
+    // productVariants.forEach((variant, index) => {
+    //     formData.append(`variant_${index + 1}`, variant.variantId);
+    //     formData.append(`tags_${index + 1}`, variant.tags.join(','));
+
+    //     // Add more fields like price and stock as needed...
+    // });
+    // productVariants.forEach((variant, index)=>{
+    //     console.log("variant", variant);
+    // });
+    // let variant_data = JSON.(productVariants);
+    formData.append("product_variants", JSON.stringify(productVariants));
+
+    // Send the POST request to the server
+    fetch('/product/create/', {
+      method: 'POST',
+      body: formData,
+      headers: headers
+    }).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log('Product created successfully', data);
+      // Redirect or handle success as needed
+    })["catch"](function (error) {
+      console.error('Error creating product', error);
+      // Handle error as needed
+    });
   };
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("section", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -32909,6 +32965,7 @@ var CreateProduct = function CreateProduct(props) {
   }, "Product Name"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
     type: "text",
     placeholder: "Product Name",
+    id: "product_name",
     className: "form-control"
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "form-group"
@@ -32917,13 +32974,14 @@ var CreateProduct = function CreateProduct(props) {
   }, "Product SKU"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
     type: "text",
     placeholder: "Product Name",
+    id: "product_sku",
     className: "form-control"
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     className: "form-group"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
     htmlFor: ""
   }, "Description"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
-    id: "",
+    id: "product_description",
     cols: "30",
     rows: "4",
     className: "form-control"

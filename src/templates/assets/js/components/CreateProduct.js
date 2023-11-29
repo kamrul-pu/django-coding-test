@@ -4,6 +4,12 @@ import 'react-tagsinput/react-tagsinput.css';
 import Dropzone from 'react-dropzone'
 
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 const CreateProduct = (props) => {
 
     const [productVariantPrices, setProductVariantPrices] = useState([])
@@ -78,6 +84,58 @@ const CreateProduct = (props) => {
     let saveProduct = (event) => {
         event.preventDefault();
         // TODO : write your code here to save the product
+        let product_name = document.getElementById("product_name").value;
+        console.log("product name", product_name)
+        let product_sku = document.getElementById("product_name").value;
+        let product_description = document.getElementById("product_description").value;
+         // Get the CSRF token from the cookie
+        const csrftoken = getCookie('csrftoken');
+        // Append CSRF token to headers
+        const headers = new Headers({
+            'X-CSRFToken': csrftoken,
+        });
+        // Prepare data to send to the server
+        const formData = new FormData();
+        formData.append('product_name', product_name);
+        formData.append('product_sku', product_sku);
+        formData.append('description', product_description);
+
+        // const files = document.files;
+        // console.log("fiels", files);
+
+        // Append product image
+        // const productImageInput = document.getElementById('productImage');
+        // const productImageFile = productImageInput.files[0];
+        // formData.append('product_image', productImageFile);
+
+        // productVariants is an array containing variant data
+        // productVariants.forEach((variant, index) => {
+        //     formData.append(`variant_${index + 1}`, variant.variantId);
+        //     formData.append(`tags_${index + 1}`, variant.tags.join(','));
+
+        //     // Add more fields like price and stock as needed...
+        // });
+        // productVariants.forEach((variant, index)=>{
+        //     console.log("variant", variant);
+        // });
+        // let variant_data = JSON.(productVariants);
+        formData.append("product_variants", JSON.stringify(productVariants));
+
+        // Send the POST request to the server
+        fetch('/product/create/', {
+            method: 'POST',
+            body: formData,
+            headers: headers,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Product created successfully', data);
+            // Redirect or handle success as needed
+        })
+        .catch(error => {
+            console.error('Error creating product', error);
+            // Handle error as needed
+        });
     }
 
 
@@ -90,15 +148,15 @@ const CreateProduct = (props) => {
                             <div className="card-body">
                                 <div className="form-group">
                                     <label htmlFor="">Product Name</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
+                                    <input type="text" placeholder="Product Name" id="product_name" className="form-control"/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Product SKU</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
+                                    <input type="text" placeholder="Product Name" id="product_sku" className="form-control"/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Description</label>
-                                    <textarea id="" cols="30" rows="4" className="form-control"></textarea>
+                                    <textarea id="product_description" cols="30" rows="4" className="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
